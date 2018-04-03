@@ -6,4 +6,7 @@
     <color name="alpha_6">#6000</color>
     <color name="blue">#009ed3</color>
     <color name="white">#ffffff</color>
+    <color name="transparency">#00000000</color>
+    <color name="gray">#c0c0c0</color>
+    <color name="gray_back">#505050</color>
 </resources>

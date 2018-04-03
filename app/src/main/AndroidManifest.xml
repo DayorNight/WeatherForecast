@@ -25,6 +25,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".PublicFragmentActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="PublicFragmentActivity"
+            android:launchMode="singleTask"
+            android:theme="@style/AppTheme"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

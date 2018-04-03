@@ -14,7 +14,7 @@
     <!--图片-->
     <dimen name="Img_big">42dp</dimen>
     <!--小图片-->
-    <dimen name="Img_min">24dp</dimen>
+    <dimen name="Img_min">28dp</dimen>
     <!--底部高度-->
     <dimen name="bottom_space">58dp</dimen>
     <dimen name="page_drag_min_width">80dp</dimen>

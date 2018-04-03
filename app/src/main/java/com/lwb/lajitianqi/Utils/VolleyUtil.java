@@ -26,7 +26,7 @@ public class VolleyUtil {
         stringRequest = new StringRequest(Request.Method.GET,url,vif.successListener(),vif.errorListener());
         stringRequest.setTag(tag);
         BaseApplication.getHttpQueues().add(stringRequest);
-        BaseApplication.getHttpQueues().start();
+//        BaseApplication.getHttpQueues().start();
     }
 
     public static void getJson(Context context,String url, String tag, VolleyJsonInterface vif){
@@ -34,7 +34,7 @@ public class VolleyUtil {
         jsonObjectRequest = new JsonObjectRequest(Request.Method.GET,url,null,vif.successListener(),vif.errorListener());
         jsonObjectRequest.setTag(tag);
         BaseApplication.getHttpQueues().add(jsonObjectRequest);
-        BaseApplication.getHttpQueues().start();
+//        BaseApplication.getHttpQueues().start();
     }
 
     public static void postString(Context context, String url, String tag, final Map<String,String> params, VolleyInterface vif){

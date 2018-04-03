@@ -1,4 +1,4 @@
-package com.lwb.lajitianqi.MVP.Presenter;
+package com.lwb.lajitianqi.Base;
 
 /**
  * P层的 基类

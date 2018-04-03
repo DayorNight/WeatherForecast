@@ -1,6 +1,7 @@
 package com.lwb.lajitianqi.MVP.Presenter;
 
 
+import com.lwb.lajitianqi.Base.BasePresenter;
 import com.lwb.lajitianqi.MVP.IView.IWelcomeView;
 import com.lwb.lajitianqi.MVP.WelcomeActivity;
 
@@ -8,7 +9,7 @@ import com.lwb.lajitianqi.MVP.WelcomeActivity;
  * Created by Administrator on 2017/9/6.
  */
 
-public class WelcomePresenter extends BasePresenter{
+public class WelcomePresenter extends BasePresenter {
 
     private WelcomeActivity context;
     private IWelcomeView iWelcomeView;

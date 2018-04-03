@@ -1,29 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@mipmap/img_home"
     tools:context="com.lwb.lajitianqi.MainActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/blue"
-        >
-        <TextView
-            android:id="@+id/tv_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:textSize="@dimen/standard_title"
-            android:gravity="center"
-            android:textColor="@color/white"
-            android:textStyle="bold"
-            android:text="@string/app_name"
-            android:drawableRight="@mipmap/ic_location"
-            />
+        android:background="@color/blue">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/tv_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center"
+                android:drawableRight="@mipmap/ic_location"
+                android:gravity="center"
+                android:text="@string/app_name"
+                android:textColor="@color/white"
+                android:textSize="@dimen/standard_title"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/img_settings"
+                android:layout_width="@dimen/Img_min"
+                android:layout_height="@dimen/Img_min"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="@dimen/space_line"
+                android:src="@mipmap/ic_setting" />
+        </RelativeLayout>
     </android.support.v7.widget.Toolbar>
 
 
