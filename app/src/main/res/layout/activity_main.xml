@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@mipmap/img_home"
+    android:orientation="vertical"
     tools:context="com.lwb.lajitianqi.MainActivity">
 
     <android.support.v7.widget.Toolbar
@@ -40,5 +41,149 @@
         </RelativeLayout>
     </android.support.v7.widget.Toolbar>
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <!--头部-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_line2"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tv_temperature"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="27"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/SP100" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:layout_toRightOf="@+id/tv_temperature"
+                        android:text="℃"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/SP35" />
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/tv_cond_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="晴"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/standard_title"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_tmp_max_min"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_line"
+                    android:text="28℃/20℃"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/Importan_work" />
+
+                <TextView
+                    android:id="@+id/tv_qlty"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_line"
+                    android:text="空气优"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/standard_work" />
+            </LinearLayout>
+            <!--小时预报-->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/space_line2">
+                <TextView
+                    android:id="@+id/tv_publish"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="1分钟前发布"
+                    android:textColor="@color/white" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:text="中国天气通"
+                    android:textColor="@color/white" />
+                <View
+                    android:id="@+id/V_divider"
+                    android:layout_width="match_parent"
+                    android:layout_height="1px"
+                    android:layout_below="@+id/tv_publish"
+                    android:background="@color/white"/>
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recyclerView"
+                    android:layout_below="@+id/V_divider"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+            </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_below="@+id/tv_publish"
+                android:layout_marginLeft="@dimen/space_line2"
+                android:layout_marginRight="@dimen/space_line2"
+                android:background="@color/white"/>
+            <!--天气预报-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/space_line2"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:layout_weight="1"
+                    android:text="4月4日星期五"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="晴"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="27℃/13℃"/>
+
+            </LinearLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_below="@+id/tv_publish"
+                android:layout_marginLeft="@dimen/space_line2"
+                android:layout_marginRight="@dimen/space_line2"
+                android:background="@color/white"/>
+            <!--空气质量-->
+            <!--舒适度-->
+            <!--风向风力-->
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

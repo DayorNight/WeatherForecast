@@ -4,11 +4,24 @@
     android:layout_height="match_parent"
     android:background="@mipmap/img_homes"
     android:orientation="vertical">
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/space_line2"
-        android:text="@string/select_city"/>
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/space_line2"
+            android:text="@string/select_city"/>
+        <TextView
+            android:id="@+id/tv_cityName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+             />
+    </LinearLayout>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/add_recyclerView"
         android:layout_width="match_parent"

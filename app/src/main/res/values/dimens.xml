@@ -19,4 +19,7 @@
     <dimen name="bottom_space">58dp</dimen>
     <dimen name="page_drag_min_width">80dp</dimen>
     <dimen name="page_drag_max_height">100dp</dimen>
+    <dimen name="SP100">100sp</dimen>
+    <dimen name="SP25">25sp</dimen>
+    <dimen name="SP35">35sp</dimen>
 </resources>

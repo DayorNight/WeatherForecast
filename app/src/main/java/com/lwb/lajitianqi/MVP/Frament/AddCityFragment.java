@@ -1,12 +1,12 @@
 package com.lwb.lajitianqi.MVP.Frament;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
 import com.android.volley.VolleyError;
 import com.google.gson.Gson;
@@ -20,11 +20,7 @@ import com.lwb.lajitianqi.Constant;
 import com.lwb.lajitianqi.R;
 import com.lwb.lajitianqi.Utils.GridDivider;
 import com.lwb.lajitianqi.Utils.VolleyInterface;
-import com.lwb.lajitianqi.Utils.VolleyJsonInterface;
 import com.lwb.lajitianqi.Utils.VolleyUtil;
-
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +33,9 @@ public class AddCityFragment extends BaseFragment {
 
     private RecyclerView add_recyclerView;
     private AddCityAdapter addCityAdapter;
+    private String addressUrl;
+    private TextView tv_cityName;
+    private StringBuilder sb;
 
     /**
      * Frament退栈监听
@@ -89,6 +88,7 @@ public class AddCityFragment extends BaseFragment {
         addCityAdapter = new AddCityAdapter(activity,datas);
         add_recyclerView.setAdapter(addCityAdapter);
         add_recyclerView.addItemDecoration(new GridDivider(activity,2, Color.WHITE));
+        tv_cityName = (TextView) fin(R.id.tv_cityName);
     }
 
     /**
@@ -96,32 +96,58 @@ public class AddCityFragment extends BaseFragment {
      */
     @Override
     public void initData() {
-        VolleyUtil.getString(activity, Constant.AddressUrl, "AddressUrl", new VolleyInterface() {
+        sb = new StringBuilder();
+        getCity(Constant.AddressUrl,Constant.AddressUrl);
+        addressUrl = Constant.AddressUrl;
+    }
+    int i=0;
+    private void getCity(String url,String tag) {
+        ++i;
+        datas.clear();
+        VolleyUtil.getString(activity,url,tag, new VolleyInterface() {
             @Override
             public void onSuccessString(String result) {
-                List<CityBean>  data= new Gson().fromJson(result, new TypeToken<List<CityBean>>() {
+                List<CityBean> data= new Gson().fromJson(result, new TypeToken<List<CityBean>>() {
                 }.getType());
                 datas.addAll(data);
                 addCityAdapter.notifyDataSetChanged();
             }
-
             @Override
             public void onError(VolleyError error) {
-
             }
         });
     }
+
     /**
      * listener事件监听方法，必须在子类onCreateView方法内调用
      */
+
     @Override
     public void initListener() {
         addCityAdapter.setOnItemClickListen(new OnItemClickListen() {
-
             @Override
             public void onItemClick(View v, int posiontion) {
-                Log.e("===============", "onItemClick: "+posiontion );
+                if(i>2){
+                    popback();
+                    //保存选中的城市
+                    return;
+                }
+                CityBean cityBean = datas.get(posiontion);
+                int id = cityBean.getId();
+                Log.e( "onItemClick: ", cityBean.getName());
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append(addressUrl);
+                stringBuilder.append("/"+id);
+                addressUrl = stringBuilder.toString();
+                getCity(addressUrl,addressUrl);
+                String name = cityBean.getName();
+                setSelectCity(name);
             }
         });
+    }
+
+    private void setSelectCity(String name) {
+        sb.append(name+" ");
+        tv_cityName.setText(sb);
     }
 }
