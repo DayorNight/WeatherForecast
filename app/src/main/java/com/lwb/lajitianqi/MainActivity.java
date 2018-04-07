@@ -12,17 +12,31 @@ import android.widget.TextView;
 
 import com.android.volley.VolleyError;
 import com.google.gson.Gson;
-import com.lwb.lajitianqi.Adapter.HourlyAdapter;
+import com.lwb.lajitianqi.Adapter.DailyForecastAdapter;
+import com.lwb.lajitianqi.Adapter.LifeAdapter;
 import com.lwb.lajitianqi.Bean.AirBean;
+import com.lwb.lajitianqi.Bean.AirBean.HeWeather6Bean.AirNowCityBean;
 import com.lwb.lajitianqi.Bean.WeatherBean;
+import com.lwb.lajitianqi.Bean.WeatherBean.HeWeather6Bean.DailyForecastBean;
+import com.lwb.lajitianqi.Bean.WeatherBean.HeWeather6Bean.LifestyleBean;
+import com.lwb.lajitianqi.Bean.WeatherBean.HeWeather6Bean.NowBean;
 import com.lwb.lajitianqi.Utils.FramentManages;
 import com.lwb.lajitianqi.Utils.RequestData;
 import com.lwb.lajitianqi.Utils.VolleyInterface;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = "MainActivity";
     private Toolbar toolbar;
     private TextView tv_temperature,tv_cond_txt,tv_tmp_max_min,tv_qlty;
+    private List<DailyForecastBean> daily_forecast=new ArrayList<>();
+    private DailyForecastAdapter hourlyAdapter;
+    private TextView tv_pm10,tv_pm25,tv_no2,tv_so2,tv_o3,tv_co,tv_wind_dir,tv_wind_sc,tv_wind_spd;
+    private TextView tv_hum,tv_pcpn,tv_vis;
+    private List<LifestyleBean> lifes=new ArrayList<>();
+    private LifeAdapter lifeAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,9 +55,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         RequestData.requestAir(this, "厦门", new VolleyInterface() {
             @Override
             public void onSuccessString(String result) {
-                Log.e("onSuccessString: ", result);
                 AirBean air = new Gson().fromJson(result, AirBean.class);
                 tv_qlty.setText("空气"+air.getHeWeather6().get(0).getAir_now_city().getQlty());
+                AirNowCityBean air_now_city = air.getHeWeather6().get(0).getAir_now_city();
+                tv_pm10.setText(air_now_city.getPm10());
+                tv_pm25.setText(air_now_city.getPm25());
+                tv_no2.setText(air_now_city.getNo2());
+                tv_so2.setText(air_now_city.getSo2());
+                tv_co.setText(air_now_city.getCo());
+                tv_o3.setText(air_now_city.getO3());
             }
             @Override
             public void onError(VolleyError error) {
@@ -56,16 +76,46 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 获取UI
      */
     private void initUI() {
-        tv_temperature = (TextView) findViewById(R.id.tv_temperature);
-        tv_cond_txt = (TextView) findViewById(R.id.tv_cond_txt);
-        tv_tmp_max_min = (TextView) findViewById(R.id.tv_tmp_max_min);
-        tv_qlty = (TextView) findViewById(R.id.tv_qlty);
+        //空气质量
+        tv_pm10 = F(R.id.tv_PM10);
+        tv_pm25 = F(R.id.tv_PM25);
+        tv_no2 = F(R.id.tv_NO2);
+        tv_so2 = F(R.id.tv_SO2);
+        tv_co = F(R.id.tv_CO);
+        tv_o3 = F(R.id.tv_O3);
+        //风向降水量
+        tv_wind_dir = F(R.id.tv_wind_dir);
+        tv_wind_sc = F(R.id.tv_wind_sc);
+        tv_wind_spd = F(R.id.tv_wind_spd);
+        tv_hum = F(R.id.tv_hum);
+        tv_pcpn = F(R.id.tv_pcpn);
+        tv_vis = F(R.id.tv_vis);
+        //生活指数
+
+        tv_temperature = F(R.id.tv_temperature);
+        tv_cond_txt = F(R.id.tv_cond_txt);
+        tv_tmp_max_min = F(R.id.tv_tmp_max_min);
+        tv_qlty = F(R.id.tv_qlty);
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(linearLayoutManager);
-        HourlyAdapter hourlyAdapter = new HourlyAdapter();
+        hourlyAdapter = new DailyForecastAdapter(this,daily_forecast);
         recyclerView.setAdapter(hourlyAdapter);
+
+        RecyclerView rView = (RecyclerView) findViewById(R.id.rView);
+        LinearLayoutManager Manager = new LinearLayoutManager(this);
+        Manager.setOrientation(LinearLayoutManager.VERTICAL);
+        rView.setLayoutManager(Manager);
+        lifeAdapter = new LifeAdapter(this, lifes);
+        rView.setAdapter(lifeAdapter);
+
+    }
+
+    public TextView F(int id){
+        TextView  tv_cond_txt = (TextView) findViewById(id);
+        return tv_cond_txt;
     }
 
     /**
@@ -76,25 +126,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initWeather();
         //空气质量数据
         initAir();
-        //hourly小时预报
-        initHourly();
     }
 
-    /**
-     * hourly小时预报
-     */
-    private void initHourly() {
-        RequestData.requestHourlyWeather(this, "厦门", new VolleyInterface() {
-            @Override
-            public void onSuccessString(String result) {
-                Log.e("===initHourly====",""+result);
-            }
-            @Override
-            public void onError(VolleyError error) {
-
-            }
-        });
-    }
 
     /**
      * 常规天气数据集合
@@ -103,8 +136,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         RequestData.requestWeather(this, "厦门", new VolleyInterface() {
             @Override
             public void onSuccessString(String result) {
-                Log.e(TAG, "onSuccessString: "+ result );
+                Log.e("=====result======",""+result);
                 WeatherBean weather = new Gson().fromJson(result, WeatherBean.class);
+                daily_forecast.addAll(weather.getHeWeather6().get(0).getDaily_forecast());
+                hourlyAdapter.notifyDataSetChanged();
+                List<LifestyleBean> lifestyle = weather.getHeWeather6().get(0).getLifestyle();
+                lifes.addAll(lifestyle);
+                Log.e("onSuccessString: ",""+ lifes.size());
+                lifeAdapter.notifyDataSetChanged();
                 setUI(weather);
             }
             @Override
@@ -122,6 +161,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tv_temperature.setText(heWeather6Bean.getNow().getTmp());
         tv_cond_txt.setText(heWeather6Bean.getNow().getCond_txt());
         tv_tmp_max_min.setText(heWeather6Bean.getDaily_forecast().get(0).getTmp_max()+"℃/"+heWeather6Bean.getDaily_forecast().get(0).getTmp_min()+"℃");
+        NowBean now = heWeather6Bean.getNow();
+
+        tv_wind_dir.setText(now.getWind_dir());
+        tv_wind_sc.setText(now.getWind_sc());
+        tv_wind_spd.setText(now.getWind_spd());
+        tv_hum.setText(now.getHum());
+        tv_pcpn.setText(now.getPcpn());
+        tv_vis.setText(now.getVis());
+
+
+
+
     }
 
     /**

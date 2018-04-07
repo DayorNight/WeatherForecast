@@ -103,86 +103,208 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/space_line"
-                    android:text="空气优"
+                    android:text=" "
                     android:textColor="@color/white"
                     android:textSize="@dimen/standard_work" />
             </LinearLayout>
             <!--小时预报-->
-            <RelativeLayout
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="@dimen/space_line2">
-                <TextView
-                    android:id="@+id/tv_publish"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="1分钟前发布"
-                    android:textColor="@color/white" />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:text="中国天气通"
-                    android:textColor="@color/white" />
-                <View
-                    android:id="@+id/V_divider"
-                    android:layout_width="match_parent"
-                    android:layout_height="1px"
-                    android:layout_below="@+id/tv_publish"
-                    android:background="@color/white"/>
-
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/recyclerView"
-                    android:layout_below="@+id/V_divider"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
-            </RelativeLayout>
-
+                />
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1px"
                 android:layout_below="@+id/tv_publish"
                 android:layout_marginLeft="@dimen/space_line2"
                 android:layout_marginRight="@dimen/space_line2"
-                android:background="@color/white"/>
-            <!--天气预报-->
+                android:background="@color/white" />
+            <!--空气质量-->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="@dimen/space_line2"
                 android:orientation="horizontal">
+                <!--空气质量-->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:padding="@dimen/space_line2"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/standard_work"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginBottom="@dimen/space_line2"
+                        android:textColor="@color/white"
+                        android:text="空气质量"/>
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        >
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+                            <TextView
+                                style="@style/Tv_gray"
+                                android:text="PM10"/>
+                            <TextView
+                                style="@style/Tv_gray"
+                                android:text="PM25"/>
+                            <TextView
+                                style="@style/Tv_gray"
+                                android:text="NO2"/>
+                            <TextView
+                                style="@style/Tv_gray"
+                                android:text="SO2"/>
+                            <TextView
+                                style="@style/Tv_gray"
+                                android:text="CO"/>
+                            <TextView
+                                style="@style/Tv_gray"
+                                android:text="O3"/>
+                        </LinearLayout>
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="@dimen/space_line2"
+                            android:orientation="vertical">
+                            <TextView
+                                android:id="@+id/tv_PM10"
+                                style="@style/Tv_white"
+                                />
+                            <TextView
+                                android:id="@+id/tv_PM25"
+                                style="@style/Tv_white"
+                                />
+                            <TextView
+                                android:id="@+id/tv_NO2"
+                                style="@style/Tv_white"
+                                />
+                            <TextView
+                                android:id="@+id/tv_SO2"
+                                style="@style/Tv_white"
+                                />
+                            <TextView
+                                android:id="@+id/tv_CO"
+                                style="@style/Tv_white"
+                                />
+                            <TextView
+                                android:id="@+id/tv_O3"
+                                style="@style/Tv_white"
+                                />
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </LinearLayout>
+                <!--风向降水量-->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:padding="@dimen/space_line2"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/standard_work"
+                        android:layout_marginBottom="@dimen/space_line2"
+                        android:textColor="@color/white"
+                        android:layout_gravity="center_horizontal"
+                        android:text="风向降水量"/>
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        >
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+                            <TextView
+                                style="@style/Tv_gray"
+                                android:text="风向"/>
+                            <TextView
+                                style="@style/Tv_gray"
+                                android:text="风力"/>
+                            <TextView
+                                style="@style/Tv_gray"
+                                android:text="风速"/>
+                            <TextView
+                                style="@style/Tv_gray"
+                                android:text="相对湿度"/>
+                            <TextView
+                                style="@style/Tv_gray"
+                                android:text="降水量"/>
+                            <TextView
+                                style="@style/Tv_gray"
+                                android:text="能见度"/>
+                        </LinearLayout>
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="@dimen/space_line2"
+                            android:orientation="vertical">
+                            <TextView
+                                android:id="@+id/tv_wind_dir"
+                                style="@style/Tv_white"
+                                />
+                            <TextView
+                                android:id="@+id/tv_wind_sc"
+                                style="@style/Tv_white"
+                                />
+                            <TextView
+                                android:id="@+id/tv_wind_spd"
+                                style="@style/Tv_white"
+                                />
+                            <TextView
+                                android:id="@+id/tv_hum"
+                                style="@style/Tv_white"
+                                />
+                            <TextView
+                                android:id="@+id/tv_pcpn"
+                                style="@style/Tv_white"
+                                />
+                            <TextView
+                                android:id="@+id/tv_vis"
+                                style="@style/Tv_white"
+                                />
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!--生活指数-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:padding="@dimen/space_line2"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                >
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textSize="@dimen/standard_work"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="@dimen/space_line2"
                     android:textColor="@color/white"
-                    android:layout_weight="1"
-                    android:text="4月4日星期五"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/white"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="晴"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/white"
-                    android:layout_weight="1"
-                    android:gravity="right"
-                    android:text="27℃/13℃"/>
+                    android:text="生活指数"/>
+              <android.support.v7.widget.RecyclerView
+                  android:id="@+id/rView"
+                  android:layout_width="wrap_content"
+                  android:layout_gravity="center_horizontal"
+                  android:layout_height="wrap_content"/>
 
             </LinearLayout>
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1px"
-                android:layout_below="@+id/tv_publish"
-                android:layout_marginLeft="@dimen/space_line2"
-                android:layout_marginRight="@dimen/space_line2"
-                android:background="@color/white"/>
-            <!--空气质量-->
-            <!--舒适度-->
-            <!--风向风力-->
+
         </LinearLayout>
     </ScrollView>
 
