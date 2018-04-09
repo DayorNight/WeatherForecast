@@ -25,5 +25,19 @@
             android:textSize="@dimen/standard_title"
             android:drawableRight="@mipmap/ic_go"
             />
+        <Switch
+            android:id="@+id/switch1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:switchMinWidth="40dp"
+            android:switchPadding="10dp"
+            android:typeface="normal"
+            android:textOff="关"
+            android:padding="@dimen/space_line2"
+            android:textOn="开"
+            android:checked="false"
+            android:showText="true"
+            />
     </RelativeLayout>
 </LinearLayout>

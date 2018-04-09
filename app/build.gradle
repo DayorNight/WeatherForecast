@@ -1,8 +1,10 @@
 apply plugin: 'com.android.application'
+apply plugin: 'org.greenrobot.greendao'
 
 android {
     compileSdkVersion 25
     buildToolsVersion '27.0.0'
+
     defaultConfig {
         applicationId "com.lwb.lajitianqi"
         minSdkVersion 15
@@ -11,12 +13,46 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+    greendao {
+        //版本号，升级时可配置
+        schemaVersion 1
+        daoPackage 'com.lwb.lajitianqi.gen'
+        targetGenDir 'src/main/java'
+    }
+
     buildTypes {
         release {
-            minifyEnabled false
+//            signingConfig signingConfigs.release
+            minifyEnabled true     //混淆
+            zipAlignEnabled true  //zipAlign优化
+            shrinkResources true  //移除无用的资源文件
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            debuggable true
+        }
+        debug {
+//            signingConfig signingConfigs.release
+            debuggable true
         }
     }
+
+    //多渠道打包=======================
+    productFlavors {
+        wandoujia {}
+        xiaomi {}
+    }
+    productFlavors.all { flavor ->
+        flavor.manifestPlaceholders = [UMENG_CHANNEL_VALUE: name]
+    }
+    applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            def outputFile = output.outputFile
+            if (outputFile != null && outputFile.name.endsWith('.apk')) {
+                def fileName = outputFile.name.replace(".apk", "-${defaultConfig.versionName}.apk")
+                output.outputFile = new File(outputFile.parent, fileName)
+            }
+        }
+    }
+
 }
 
 dependencies {
@@ -32,4 +68,6 @@ dependencies {
     compile files('libs/lib_volley0315.jar')
     compile 'com.android.support:recyclerview-v7:+'
     compile 'com.google.code.gson:gson:2.3.1'
+    compile 'org.greenrobot:greendao:3.2.0'
+    compile 'com.scwang.smartrefresh:SmartRefreshLayout:1.0.5'
 }

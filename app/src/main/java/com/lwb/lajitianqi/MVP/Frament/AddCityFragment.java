@@ -16,17 +16,21 @@ import com.lwb.lajitianqi.Adapter.AddCityAdapter.OnItemClickListen;
 import com.lwb.lajitianqi.Base.BaseFragment;
 import com.lwb.lajitianqi.Base.BasePresenter;
 import com.lwb.lajitianqi.Bean.CityBean;
+import com.lwb.lajitianqi.Bean.WeatherBean;
 import com.lwb.lajitianqi.Constant;
 import com.lwb.lajitianqi.R;
 import com.lwb.lajitianqi.Utils.GridDivider;
+import com.lwb.lajitianqi.Utils.RequestData;
 import com.lwb.lajitianqi.Utils.VolleyInterface;
 import com.lwb.lajitianqi.Utils.VolleyUtil;
+import com.lwb.lajitianqi.gen.DBOperation.CityOpertion;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by lwb on 2018/4/3.
- *
+ * 添加城市
  */
 
 public class AddCityFragment extends BaseFragment {
@@ -36,6 +40,7 @@ public class AddCityFragment extends BaseFragment {
     private String addressUrl;
     private TextView tv_cityName;
     private StringBuilder sb;
+    private CityOpertion cityOpertion;
 
     /**
      * Frament退栈监听
@@ -82,6 +87,7 @@ public class AddCityFragment extends BaseFragment {
      */
     @Override
     public void initView() {
+        cityOpertion = new CityOpertion();
         add_recyclerView = (RecyclerView) fin(R.id.add_recyclerView);
         GridLayoutManager Manager = new GridLayoutManager(activity,3);
         add_recyclerView.setLayoutManager(Manager);
@@ -127,24 +133,24 @@ public class AddCityFragment extends BaseFragment {
         addCityAdapter.setOnItemClickListen(new OnItemClickListen() {
             @Override
             public void onItemClick(View v, int posiontion) {
-                if(i>2){
-                    popback();
-                    //保存选中的城市
-                    return;
-                }
                 CityBean cityBean = datas.get(posiontion);
                 int id = cityBean.getId();
-                Log.e( "onItemClick: ", cityBean.getName());
+                String name = cityBean.getName();
+                if(i>2){
+                    cityOpertion.add(name);
+                    popback(1,null);
+                    return;
+                }
                 StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.append(addressUrl);
                 stringBuilder.append("/"+id);
                 addressUrl = stringBuilder.toString();
                 getCity(addressUrl,addressUrl);
-                String name = cityBean.getName();
                 setSelectCity(name);
             }
         });
     }
+
 
     private void setSelectCity(String name) {
         sb.append(name+" ");

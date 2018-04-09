@@ -32,5 +32,11 @@ public class Constant {
      */
     public final static String Intent_Go="跳转到哪个片段";
     public final static String Bundle_key="Bundle_key";
+    public final static String ResultCode_city="ResultCode_city";
+
+    public final static String Sp_Switch="Sp_Switch";
+    public final static String Sp_WeatherResult="Sp_WeatherResult";
+    public final static String Brodcast="Brodcast";
+    public final static String Brodcast_Permiss="android.permiss.AAA";
 
 }

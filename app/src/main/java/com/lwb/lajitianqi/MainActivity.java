@@ -1,6 +1,19 @@
 package com.lwb.lajitianqi;
 
+import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -9,6 +22,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.VolleyError;
 import com.google.gson.Gson;
@@ -22,30 +36,65 @@ import com.lwb.lajitianqi.Bean.WeatherBean.HeWeather6Bean.LifestyleBean;
 import com.lwb.lajitianqi.Bean.WeatherBean.HeWeather6Bean.NowBean;
 import com.lwb.lajitianqi.Utils.FramentManages;
 import com.lwb.lajitianqi.Utils.RequestData;
+import com.lwb.lajitianqi.Utils.SPUtils;
 import com.lwb.lajitianqi.Utils.VolleyInterface;
+import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = "MainActivity";
+    private static final int CAMERA_REQUEST_CODE = 1;
     private Toolbar toolbar;
-    private TextView tv_temperature,tv_cond_txt,tv_tmp_max_min,tv_qlty;
-    private List<DailyForecastBean> daily_forecast=new ArrayList<>();
+    private TextView tv_temperature, tv_cond_txt, tv_tmp_max_min, tv_qlty;
+    private List<DailyForecastBean> daily_forecast = new ArrayList<>();
     private DailyForecastAdapter hourlyAdapter;
-    private TextView tv_pm10,tv_pm25,tv_no2,tv_so2,tv_o3,tv_co,tv_wind_dir,tv_wind_sc,tv_wind_spd;
-    private TextView tv_hum,tv_pcpn,tv_vis;
-    private List<LifestyleBean> lifes=new ArrayList<>();
+    private TextView tv_pm10, tv_pm25, tv_no2, tv_so2, tv_o3, tv_co, tv_wind_dir, tv_wind_sc, tv_wind_spd;
+    private TextView tv_hum, tv_pcpn, tv_vis;
+    private List<LifestyleBean> lifes = new ArrayList<>();
     private LifeAdapter lifeAdapter;
+    private TextView tv_title;
+    private SmartRefreshLayout smartRefresh;
+    private MyUpWheatherService myService;
+    private MyBroadReceiver myBroadReceiver;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        initBrodcast();
         initUI();
         initMenu();
         initData();
+        initUpdata();
 
+    }
+
+    /**
+     * 注册广播
+     */
+    private void initBrodcast() {
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("android.permiss.AAA");
+        myBroadReceiver = new MyBroadReceiver();
+        BaseApplication.getLocalBroadcast().registerReceiver(myBroadReceiver,intentFilter);
+    }
+
+    /**
+     * 更新服务
+     */
+    private void initUpdata() {
+        Boolean Sp_Switch = (Boolean) SPUtils.get(this, Constant.Sp_Switch, false);
+        Intent intent = new Intent(MainActivity.this, MyUpWheatherService.class);
+        if(Sp_Switch){
+            startService(intent);
+        }else{
+            stopService(intent);
+        }
     }
 
     /**
@@ -56,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onSuccessString(String result) {
                 AirBean air = new Gson().fromJson(result, AirBean.class);
-                tv_qlty.setText("空气"+air.getHeWeather6().get(0).getAir_now_city().getQlty());
+                tv_qlty.setText("空气" + air.getHeWeather6().get(0).getAir_now_city().getQlty());
                 AirNowCityBean air_now_city = air.getHeWeather6().get(0).getAir_now_city();
                 tv_pm10.setText(air_now_city.getPm10());
                 tv_pm25.setText(air_now_city.getPm25());
@@ -65,6 +114,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 tv_co.setText(air_now_city.getCo());
                 tv_o3.setText(air_now_city.getO3());
             }
+
             @Override
             public void onError(VolleyError error) {
 
@@ -76,6 +126,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 获取UI
      */
     private void initUI() {
+        smartRefresh = (SmartRefreshLayout) findViewById(R.id.smartRefresh);
         //空气质量
         tv_pm10 = F(R.id.tv_PM10);
         tv_pm25 = F(R.id.tv_PM25);
@@ -101,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(linearLayoutManager);
-        hourlyAdapter = new DailyForecastAdapter(this,daily_forecast);
+        hourlyAdapter = new DailyForecastAdapter(this, daily_forecast);
         recyclerView.setAdapter(hourlyAdapter);
 
         RecyclerView rView = (RecyclerView) findViewById(R.id.rView);
@@ -111,10 +162,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         lifeAdapter = new LifeAdapter(this, lifes);
         rView.setAdapter(lifeAdapter);
 
+        smartRefresh.setOnRefreshListener(new OnRefreshListener() {
+            @Override
+            public void onRefresh(RefreshLayout refreshLayout) {
+                initData();
+                smartRefresh.finishRefresh(2000);
+            }
+        });
     }
 
-    public TextView F(int id){
-        TextView  tv_cond_txt = (TextView) findViewById(id);
+    public TextView F(int id) {
+        TextView tv_cond_txt = (TextView) findViewById(id);
         return tv_cond_txt;
     }
 
@@ -122,33 +180,48 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 获取数据
      */
     private void initData() {
-        //常规天气数据集合
-        initWeather();
-        //空气质量数据
-        initAir();
-    }
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},CAMERA_REQUEST_CODE);
+            return;
+        }else{
+            //获取当前位置
+            LocationManager systemService = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            Location location = systemService.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            double Longitude = location.getLongitude();//经度
+            double latitude = location.getLatitude();//纬度
+            String longitudes = String.valueOf(Longitude).substring(0,6);
+            String latitudes = String.valueOf(latitude).substring(0,6);
+            //常规天气数据集合
+            initWeather(longitudes+","+latitudes);
+            //空气质量数据
+            initAir();
+        }
+
+    }
 
     /**
      * 常规天气数据集合
      */
-    private void initWeather() {
-        RequestData.requestWeather(this, "厦门", new VolleyInterface() {
+    private void initWeather(String name) {
+        Log.e(TAG, "initData: "+name);
+        RequestData.requestWeather(this, name, new VolleyInterface() {
             @Override
             public void onSuccessString(String result) {
-                Log.e("=====result======",""+result);
+                daily_forecast.clear();
                 WeatherBean weather = new Gson().fromJson(result, WeatherBean.class);
                 daily_forecast.addAll(weather.getHeWeather6().get(0).getDaily_forecast());
                 hourlyAdapter.notifyDataSetChanged();
                 List<LifestyleBean> lifestyle = weather.getHeWeather6().get(0).getLifestyle();
-                lifes.addAll(lifestyle);
-                Log.e("onSuccessString: ",""+ lifes.size());
-                lifeAdapter.notifyDataSetChanged();
+                if(lifestyle!=null){
+                    lifes.clear();
+                    lifes.addAll(lifestyle);
+                    lifeAdapter.notifyDataSetChanged();
+                }
                 setUI(weather);
             }
             @Override
             public void onError(VolleyError error) {
-
             }
         });
     }
@@ -162,17 +235,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tv_cond_txt.setText(heWeather6Bean.getNow().getCond_txt());
         tv_tmp_max_min.setText(heWeather6Bean.getDaily_forecast().get(0).getTmp_max()+"℃/"+heWeather6Bean.getDaily_forecast().get(0).getTmp_min()+"℃");
         NowBean now = heWeather6Bean.getNow();
-
         tv_wind_dir.setText(now.getWind_dir());
         tv_wind_sc.setText(now.getWind_sc());
         tv_wind_spd.setText(now.getWind_spd());
         tv_hum.setText(now.getHum());
         tv_pcpn.setText(now.getPcpn());
         tv_vis.setText(now.getVis());
-
-
-
-
     }
 
     /**
@@ -182,7 +250,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         //设置Logo
         toolbar.setLogo(R.mipmap.ic_launcher);
-        TextView tv_title = (TextView) findViewById(R.id.tv_title);
+        tv_title = (TextView) findViewById(R.id.tv_title);
         ImageView img_settings = (ImageView) findViewById(R.id.img_settings);
         tv_title.setOnClickListener(this);
         img_settings.setOnClickListener(this);
@@ -194,12 +262,68 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (view.getId()){
             case R.id.tv_title:
                 bundle.putString(Constant.Bundle_key,getString(R.string.run_city));
-                startActivity(PublicFragmentActivity.createIntent(this, FramentManages.Run_City, bundle));
+                startActivityForResult(PublicFragmentActivity.createIntent(this, FramentManages.Run_City, bundle),RESULT_CANCELED);
                 break;
             case R.id.img_settings:
                 bundle.putString(Constant.Bundle_key,getString(R.string.settings));
                 startActivity(PublicFragmentActivity.createIntent(this, FramentManages.Settings, bundle));
                 break;
+        }
+    }
+
+    /**
+     * Dispatch incoming result to the correct fragment.
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (resultCode){
+            case 1:
+                String cityName = data.getExtras().getString(Constant.ResultCode_city);
+                tv_title.setText(cityName);
+                initWeather(cityName);
+                break;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == CAMERA_REQUEST_CODE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Log.e(TAG, "onRequestPermissionsResult: "+111111 );
+                initData();
+            } else {
+                Log.e(TAG, "onRequestPermissionsResult: "+22222 );
+                //用户勾选了不再询问
+                //提示用户手动打开权限
+                    Toast.makeText(this, "权限已被禁止", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        BaseApplication.getLocalBroadcast().unregisterReceiver(myBroadReceiver);
+    }
+
+    class MyBroadReceiver extends BroadcastReceiver{
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String string = intent.getExtras().getString(Constant.Brodcast);
+            switch (string){
+                case "Service":
+                    initData();
+                    break;
+                case "Switch":
+                    initUpdata();
+                    break;
+            }
+
         }
     }
 }

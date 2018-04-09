@@ -63,6 +63,7 @@ public class AddCityAdapter extends RecyclerView.Adapter<AddCityAdapter.AddCityV
     public interface OnItemClickListen{
        void onItemClick(View v,int posiontion);
     }
+
     public void setOnItemClickListen(OnItemClickListen ItemClickListen) {
         onItemClickListen=ItemClickListen;
     }
