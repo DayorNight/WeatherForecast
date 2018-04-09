@@ -28,14 +28,6 @@ import java.lang.reflect.Field;
 
 /**
  * TODO 屏幕相关类
- * 1、获取屏幕宽度，单位为px
- * 2、获取屏幕高度，单位为px
- * 3、获取系统dp尺寸密度值
- * 4、获取系统字体sp密度值
- * 5、获得状态栏的高度
- * 6、获取当前屏幕截图，包含状态栏
- * 7、获取当前屏幕截图，不包含状态栏
- * 8、获取DisplayMetrics对象
  */
 public class ScreenUtil {
 	private ScreenUtil(){}
@@ -58,84 +50,10 @@ public class ScreenUtil {
 		return getDisplayMetrics(context).heightPixels;
 	}
 
-	/**
-	 * 3、获取系统dp尺寸密度值
-	 * @param context   应用程序上下文
-	 * @return
-	 */
-	public static float getDensity(Context context){
-		return getDisplayMetrics(context).density;
-	}
+
 
 	/**
-	 * 4、获取系统字体sp密度值
-	 * @param context   应用程序上下文
-	 * @return
-	 */
-	public static float getScaledDensity(Context context){
-		return getDisplayMetrics(context).scaledDensity;
-	}
-
-	/**
-	 * 5、获得状态栏的高度
-	 * @param context
-	 * @return
-	 */
-	public static int getStatusHeight(Context context){
-		int statusHeight = -1;
-		try {
-			Class<?> clazz = Class.forName("com.android.internal.R$dimen");
-			Object object = clazz.newInstance();
-			int height = Integer.parseInt(clazz.getField("status_bar_height").get(object).toString());
-			statusHeight = context.getResources().getDimensionPixelSize(height);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return statusHeight;
-	}
-
-	/**
-	 * 6、获取当前屏幕截图，包含状态栏
-	 * @param activity
-	 * @return
-	 */
-	public static Bitmap snapShotWithStatusBar(Activity activity){
-		View decorView = activity.getWindow().getDecorView();
-		decorView.setDrawingCacheEnabled(true);
-		decorView.buildDrawingCache();
-		Bitmap bmp = decorView.getDrawingCache();
-		int width = getScreenWidth(activity);
-		int height = getScreenHeight(activity);
-		Bitmap bitmap = null;
-		bitmap = Bitmap.createBitmap(bmp, 0, 0, width, height);
-		decorView.destroyDrawingCache();
-		return bitmap;
-	}
-
-	/**
-	 * 7、获取当前屏幕截图，不包含状态栏
-	 * @param activity
-	 * @return
-	 */
-	public static Bitmap snapShotWithoutStatusBar(Activity activity){
-		View decorView = activity.getWindow().getDecorView();
-		decorView.setDrawingCacheEnabled(true);
-		decorView.buildDrawingCache();
-		Bitmap bmp = decorView.getDrawingCache();
-		Rect frame = new Rect();
-		activity.getWindow().getDecorView().getWindowVisibleDisplayFrame(frame);
-		int statusHeight = frame.top;
-
-		int width = getScreenWidth(activity);
-		int height = getScreenHeight(activity);
-		Bitmap bitmap = null;
-		bitmap = Bitmap.createBitmap(bmp, 0, statusHeight, width, height - statusHeight);
-		decorView.destroyDrawingCache();
-		return bitmap;
-	}
-
-	/**
-	 * 8、获取DisplayMetrics对象
+	 * 获取DisplayMetrics对象
 	 * @param context   应用程序上下文
 	 * @return
 	 */
@@ -173,25 +91,4 @@ public class ScreenUtil {
 		return screenSize;
 	}
 
-	// 获取状态栏高度
-	public static int getStatusBarHeight(Context context) {
-		if (statusBarHeight <= 0) {
-			Rect frame = new Rect();
-			((Activity) context).getWindow().getDecorView().getWindowVisibleDisplayFrame(frame);
-			statusBarHeight = frame.top;
-		}
-		if (statusBarHeight <= 0) {
-			try {
-				Class<?> c = Class.forName("com.android.internal.R$dimen");
-				Object obj = c.newInstance();
-				Field field = c.getField("status_bar_height");
-				int x = Integer.parseInt(field.get(obj).toString());
-				statusBarHeight = context.getResources().getDimensionPixelSize(x);
-
-			} catch (Exception e1) {
-				e1.printStackTrace();
-			}
-		}
-		return statusBarHeight;
-	}
 }
