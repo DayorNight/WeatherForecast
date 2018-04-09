@@ -26,7 +26,7 @@
                 android:layout_gravity="center"
                 android:drawableRight="@mipmap/ic_location"
                 android:gravity="center"
-                android:text="@string/app_name"
+                android:text="@string/appName"
                 android:textColor="@color/white"
                 android:textSize="@dimen/standard_title"
                 android:textStyle="bold" />

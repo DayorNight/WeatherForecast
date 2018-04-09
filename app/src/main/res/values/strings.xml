@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">垃圾天气预报</string>
+    <string name="appName">垃圾天气预报</string>
     <string name="settings">设置</string>
     <string name="run_city">管理城市</string>
     <string name="auto_update">自动更新</string>
