@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.lwb.lajitianqi.Bean.CityManagerBean;
@@ -44,26 +45,38 @@ public class RunCityAdapter extends RecyclerView.Adapter<RunCityAdapter.RunCityV
         return data.size();
     }
 
-    class RunCityViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+
+    class RunCityViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         TextView tv_address;
         public RunCityViewHolder(View v) {
             super(v);
             tv_address= (TextView) v.findViewById(R.id.tv_address);
             v.setOnClickListener(this);
+            v.setOnLongClickListener(this);
         }
 
         @Override
         public void onClick(View view) {
             onItemClickListen.onItemClick(view,getPosition());
         }
+
+        @Override
+        public boolean onLongClick(View view) {
+            onItemClickListen.onLongItemClick(view,getPosition());
+            return true;
+        }
     }
 
-    public AddCityAdapter.OnItemClickListen onItemClickListen;
+    public RunCityAdapter.OnItemClickListen onItemClickListen;
 
     public interface OnItemClickListen{
         void onItemClick(View v,int posiontion);
+
+        void onLongItemClick(View v,int posiontion);
     }
-    public void setOnItemClickListen(AddCityAdapter.OnItemClickListen ItemClickListen) {
+
+    public void setOnItemClickListen(RunCityAdapter.OnItemClickListen ItemClickListen) {
         onItemClickListen=ItemClickListen;
     }
 }

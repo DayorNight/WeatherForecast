@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private SmartRefreshLayout smartRefresh;
     private MyUpWheatherService myService;
     private MyBroadReceiver myBroadReceiver;
+    private String adress;
 
 
     @Override
@@ -100,8 +101,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     /**
      * 空气质量数据
      */
-    private void initAir() {
-        RequestData.requestAir(this, "厦门", new VolleyInterface() {
+    private void initAir(String name) {
+        RequestData.requestAir(this, name, new VolleyInterface() {
             @Override
             public void onSuccessString(String result) {
                 AirBean air = new Gson().fromJson(result, AirBean.class);
@@ -165,7 +166,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         smartRefresh.setOnRefreshListener(new OnRefreshListener() {
             @Override
             public void onRefresh(RefreshLayout refreshLayout) {
-                initData();
+                String cityName = (String) SPUtils.get(MainActivity.this, "CityName", "");
+                if(!cityName.equals("")){
+                    initWeather(cityName);
+                    //空气质量数据
+                    initAir(cityName);
+                }else{
+                    //常规天气数据集合
+                    initWeather(adress);
+                    //空气质量数据
+                    initAir(adress);
+                }
                 smartRefresh.finishRefresh(2000);
             }
         });
@@ -192,10 +203,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             double latitude = location.getLatitude();//纬度
             String longitudes = String.valueOf(Longitude).substring(0,6);
             String latitudes = String.valueOf(latitude).substring(0,6);
+            adress = longitudes + "," + latitudes;
             //常规天气数据集合
-            initWeather(longitudes+","+latitudes);
+            initWeather(adress);
             //空气质量数据
-            initAir();
+            initAir(adress);
         }
 
     }
@@ -204,10 +216,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 常规天气数据集合
      */
     private void initWeather(String name) {
-        Log.e(TAG, "initData: "+name);
+        Log.e(TAG, "initWeather: "+name );
         RequestData.requestWeather(this, name, new VolleyInterface() {
             @Override
             public void onSuccessString(String result) {
+                Log.e(TAG, "onSuccessString: "+result );
                 daily_forecast.clear();
                 WeatherBean weather = new Gson().fromJson(result, WeatherBean.class);
                 daily_forecast.addAll(weather.getHeWeather6().get(0).getDaily_forecast());
@@ -283,8 +296,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (resultCode){
             case 1:
                 String cityName = data.getExtras().getString(Constant.ResultCode_city);
+                Log.e(TAG, "onActivityResult: "+cityName);
                 tv_title.setText(cityName);
                 initWeather(cityName);
+                initAir(cityName);
                 break;
         }
     }

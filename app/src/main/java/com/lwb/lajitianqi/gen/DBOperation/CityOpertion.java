@@ -17,7 +17,9 @@ public class CityOpertion {
      * @param name
      */
     public void add(String name){
-        cityDao.insert(new CityManagerBean(name));//添加一个
+        CityManagerBean cityManagerBean = new CityManagerBean();
+        cityManagerBean.setCityName(name);
+        cityDao.insert(cityManagerBean);//添加一个
     }
 
     /**

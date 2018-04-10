@@ -15,7 +15,7 @@ import com.lwb.lajitianqi.Bean.CityManagerBean;
 /** 
  * DAO for table "CITY_MANAGER_BEAN".
 */
-public class CityManagerBeanDao extends AbstractDao<CityManagerBean, Void> {
+public class CityManagerBeanDao extends AbstractDao<CityManagerBean, Long> {
 
     public static final String TABLENAME = "CITY_MANAGER_BEAN";
 
@@ -24,7 +24,8 @@ public class CityManagerBeanDao extends AbstractDao<CityManagerBean, Void> {
      * Can be used for QueryBuilder and for referencing column names.
      */
     public static class Properties {
-        public final static Property CityName = new Property(0, String.class, "cityName", false, "cityName");
+        public final static Property Id = new Property(0, Long.class, "id", true, "_id");
+        public final static Property CityName = new Property(1, String.class, "cityName", false, "cityName");
     }
 
 
@@ -40,7 +41,8 @@ public class CityManagerBeanDao extends AbstractDao<CityManagerBean, Void> {
     public static void createTable(Database db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"CITY_MANAGER_BEAN\" (" + //
-                "\"cityName\" TEXT);"); // 0: cityName
+                "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
+                "\"cityName\" TEXT);"); // 1: cityName
     }
 
     /** Drops the underlying database table. */
@@ -53,9 +55,14 @@ public class CityManagerBeanDao extends AbstractDao<CityManagerBean, Void> {
     protected final void bindValues(DatabaseStatement stmt, CityManagerBean entity) {
         stmt.clearBindings();
  
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
+        }
+ 
         String cityName = entity.getCityName();
         if (cityName != null) {
-            stmt.bindString(1, cityName);
+            stmt.bindString(2, cityName);
         }
     }
 
@@ -63,45 +70,55 @@ public class CityManagerBeanDao extends AbstractDao<CityManagerBean, Void> {
     protected final void bindValues(SQLiteStatement stmt, CityManagerBean entity) {
         stmt.clearBindings();
  
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
+        }
+ 
         String cityName = entity.getCityName();
         if (cityName != null) {
-            stmt.bindString(1, cityName);
+            stmt.bindString(2, cityName);
         }
     }
 
     @Override
-    public Void readKey(Cursor cursor, int offset) {
-        return null;
+    public Long readKey(Cursor cursor, int offset) {
+        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
     }    
 
     @Override
     public CityManagerBean readEntity(Cursor cursor, int offset) {
         CityManagerBean entity = new CityManagerBean( //
-            cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0) // cityName
+            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1) // cityName
         );
         return entity;
     }
      
     @Override
     public void readEntity(Cursor cursor, CityManagerBean entity, int offset) {
-        entity.setCityName(cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0));
+        entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
+        entity.setCityName(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
      }
     
     @Override
-    protected final Void updateKeyAfterInsert(CityManagerBean entity, long rowId) {
-        // Unsupported or missing PK type
-        return null;
+    protected final Long updateKeyAfterInsert(CityManagerBean entity, long rowId) {
+        entity.setId(rowId);
+        return rowId;
     }
     
     @Override
-    public Void getKey(CityManagerBean entity) {
-        return null;
+    public Long getKey(CityManagerBean entity) {
+        if(entity != null) {
+            return entity.getId();
+        } else {
+            return null;
+        }
     }
 
     @Override
     public boolean hasKey(CityManagerBean entity) {
-        // TODO
-        return false;
+        return entity.getId() != null;
     }
 
     @Override

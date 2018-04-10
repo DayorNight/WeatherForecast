@@ -5,9 +5,11 @@ import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
-import com.lwb.lajitianqi.Adapter.AddCityAdapter;
 import com.lwb.lajitianqi.Adapter.RunCityAdapter;
 import com.lwb.lajitianqi.Base.BaseFragment;
 import com.lwb.lajitianqi.Base.BasePresenter;
@@ -15,6 +17,7 @@ import com.lwb.lajitianqi.Bean.CityManagerBean;
 import com.lwb.lajitianqi.Constant;
 import com.lwb.lajitianqi.R;
 import com.lwb.lajitianqi.Utils.FramentManages;
+import com.lwb.lajitianqi.Utils.SPUtils;
 import com.lwb.lajitianqi.gen.DBOperation.CityOpertion;
 import java.util.ArrayList;
 import java.util.List;
@@ -99,17 +102,33 @@ public class RunCityFragment extends BaseFragment implements View.OnClickListene
     public void initListener() {
         TextView tv_addcity = (TextView) fin(R.id.tv_addcity);
         tv_addcity.setOnClickListener(this);
-        runCityAdapter.setOnItemClickListen(new AddCityAdapter.OnItemClickListen() {
+        runCityAdapter.setOnItemClickListen(new RunCityAdapter.OnItemClickListen() {
             @Override
             public void onItemClick(View v, int posiontion) {
                 CityManagerBean cityBean = datas.get(posiontion);
                 String cityName = cityBean.getCityName();
                 Bundle bundle = new Bundle();
                 bundle.putString("CityName",cityName);
+                SPUtils.put(activity,"CityName",cityName);
                 Intent intent = new Intent();
                 intent.putExtra(Constant.ResultCode_city,cityName);
                 activity.setResult(1,intent);
                 popback();
+            }
+            @Override
+            public void onLongItemClick(View v, final int posiontion) {
+                final TextView tv_delete = (TextView) v.findViewById(R.id.tv_delete);
+                tv_delete.setVisibility(View.VISIBLE);
+                tv_delete.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        CityManagerBean cityBean = datas.get(posiontion);
+                        cityOpertion.delete(cityBean.getCityName());
+                        datas.remove(cityBean);
+                        runCityAdapter.notifyDataSetChanged();
+                        tv_delete.setVisibility(View.GONE);
+                    }
+                });
             }
         });
     }
