@@ -47,7 +47,8 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = "MainActivity";
-    private static final int CAMERA_REQUEST_CODE = 1;
+    private static final int ACCESS_FINE_LOCATION = 1;//内存
+    private static final int WRITE_EXTERNAL_STORAGE = 2;//内存
     private Toolbar toolbar;
     private TextView tv_temperature, tv_cond_txt, tv_tmp_max_min, tv_qlty;
     private List<DailyForecastBean> daily_forecast = new ArrayList<>();
@@ -82,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("android.permiss.AAA");
         myBroadReceiver = new MyBroadReceiver();
-        BaseApplication.getLocalBroadcast().registerReceiver(myBroadReceiver,intentFilter);
+        BaseApplication.getLocalBroadcast().registerReceiver(myBroadReceiver, intentFilter);
     }
 
     /**
@@ -91,9 +92,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void initUpdata() {
         Boolean Sp_Switch = (Boolean) SPUtils.get(this, Constant.Sp_Switch, false);
         Intent intent = new Intent(MainActivity.this, MyUpWheatherService.class);
-        if(Sp_Switch){
+        if (Sp_Switch) {
             startService(intent);
-        }else{
+        } else {
             stopService(intent);
         }
     }
@@ -167,11 +168,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onRefresh(RefreshLayout refreshLayout) {
                 String cityName = (String) SPUtils.get(MainActivity.this, "CityName", "");
-                if(!cityName.equals("")){
+                if (!cityName.equals("")) {
                     initWeather(cityName);
                     //空气质量数据
                     initAir(cityName);
-                }else{
+                } else if(adress!=null){
                     //常规天气数据集合
                     initWeather(adress);
                     //空气质量数据
@@ -191,25 +192,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 获取数据
      */
     private void initData() {
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},CAMERA_REQUEST_CODE);
+         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},ACCESS_FINE_LOCATION);
+            return;
+        }else if(ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},WRITE_EXTERNAL_STORAGE);
             return;
         }else{
             //获取当前位置
-            LocationManager systemService = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            Location location = systemService.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            double Longitude = location.getLongitude();//经度
-            double latitude = location.getLatitude();//纬度
-            String longitudes = String.valueOf(Longitude).substring(0,6);
-            String latitudes = String.valueOf(latitude).substring(0,6);
-            adress = longitudes + "," + latitudes;
-            //常规天气数据集合
-            initWeather(adress);
-            //空气质量数据
-            initAir(adress);
+                LocationManager systemService = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                Location location = systemService.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+             if(location!=null){
+                 double Longitude = location.getLongitude();//经度
+                 double latitude = location.getLatitude();//纬度
+                 String longitudes = String.valueOf(Longitude).substring(0,6);
+                 String latitudes = String.valueOf(latitude).substring(0,6);
+                 adress = longitudes + "," + latitudes;
+                 //常规天气数据集合
+                 initWeather(adress);
+                 //空气质量数据
+                 initAir(adress);
+             }
         }
-
     }
 
     /**
@@ -220,9 +224,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         RequestData.requestWeather(this, name, new VolleyInterface() {
             @Override
             public void onSuccessString(String result) {
-                Log.e(TAG, "onSuccessString: "+result );
+
                 daily_forecast.clear();
                 WeatherBean weather = new Gson().fromJson(result, WeatherBean.class);
+                Log.e(TAG, "onSuccessString-------weather: "+weather );
                 daily_forecast.addAll(weather.getHeWeather6().get(0).getDaily_forecast());
                 hourlyAdapter.notifyDataSetChanged();
                 List<LifestyleBean> lifestyle = weather.getHeWeather6().get(0).getLifestyle();
@@ -307,15 +312,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == CAMERA_REQUEST_CODE) {
+        if (requestCode == ACCESS_FINE_LOCATION) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Log.e(TAG, "onRequestPermissionsResult: "+111111 );
                 initData();
             } else {
-                Log.e(TAG, "onRequestPermissionsResult: "+22222 );
-                //用户勾选了不再询问
-                //提示用户手动打开权限
-                    Toast.makeText(this, "权限已被禁止", Toast.LENGTH_SHORT).show();
+                if(ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                    ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},WRITE_EXTERNAL_STORAGE);
+                }
+            }
+        }else if(requestCode == WRITE_EXTERNAL_STORAGE){
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Log.e(TAG, "onRequestPermissionsResult: "+3333 );
+                initData();
+            } else {
+                Log.e(TAG, "onRequestPermissionsResult: "+4444 );
+                Toast.makeText(this, "权限已被禁止", Toast.LENGTH_SHORT).show();
             }
         }
     }
