@@ -19,4 +19,4 @@
 
 其它开源项目
 
-        封装Android常用工具类：https://github.com/DayorNight/LwbUtils 
+        封装Android常用工具类：https://github.com/DayorNight/LwbUtil.git
